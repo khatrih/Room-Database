@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">OnBoardingTask</string>
+
+    <!--login-->
+    <string name="todo">Image Not Found</string>
+    <string name="user_name">Enter Name</string>
+    <string name="first_name">Enter First Name</string>
+    <string name="last_name">Enter Last Name</string>
+    <string name="password">Enter Password</string>
+    <string name="email">Enter Email</string>
+    <string name="mobile">Enter Mobile</string>
+    <string name="age">Age</string>
+    <string name="btn_login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+    <string name="user_list">User Lists</string>
+    <string name="empty">Empty</string>
+    <string name="home">Home</string>
+    <string name="update">Update</string>
+    <string name="back_button">Back</string>
+    <string name="please_enter_valid_name">please enter valid name</string>
+</resources>
