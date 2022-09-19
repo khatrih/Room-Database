@@ -19,4 +19,10 @@
     <string name="update">Update</string>
     <string name="back_button">Back</string>
     <string name="please_enter_valid_name">please enter valid name</string>
+    <string name="logout">logout</string>
+    <string name="edittext_empty_check">Field can not be empty</string>
+    <string name="weak_password">password is too weak</string>
+    <string name="valid_pnohe_number">please enter valid mobile number</string>
+    <string name="age_eligibility">You cannot br eligible</string>
+    <string name="password_structure">Use Special character, symbol, number and one capital letter</string>
 </resources>

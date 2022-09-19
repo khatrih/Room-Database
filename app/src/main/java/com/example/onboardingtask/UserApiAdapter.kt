@@ -7,22 +7,20 @@ import com.example.onboardingtask.databinding.ItemApiUserBinding
 
 
 class UserApiAdapter(private val mList: ArrayList<ApiUserModel>) :
-    RecyclerView.Adapter<UserApiAdapter.viewHolder>() {
-    class viewHolder(val binding: ItemApiUserBinding) : RecyclerView.ViewHolder(binding.root)
+    RecyclerView.Adapter<UserApiAdapter.ViewHolder>() {
+    class ViewHolder(val binding: ItemApiUserBinding) : RecyclerView.ViewHolder(binding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): viewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
             ItemApiUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return viewHolder(binding)
+        return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: viewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model: ApiUserModel = mList.get(position)
-
         holder.binding.tvUsersName.text = model.name
         holder.binding.tvUsersEmail.text = model.email
         holder.binding.tvUsersGender.text = model.gender
-
     }
 
     override fun getItemCount(): Int {

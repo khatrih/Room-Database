@@ -5,28 +5,25 @@ import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.util.Patterns
+import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.onboardingtask.databinding.ActivitySignUpBinding
-import com.example.utils.getPathFromUri
+import com.example.utils.*
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 
-
-class SignUpActivity : AppCompatActivity() {
+class SignUpActivity : BaseActivity(), View.OnClickListener {
     private var imageUri: String? = null
     private val myCalendar: Calendar = Calendar.getInstance()
     private lateinit var userDB: UserDB
@@ -35,14 +32,13 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var userModel: UserModel
     private val password_patterns: Pattern = Pattern.compile(
         "^" +
-                "(?=.*[@#$%^&+=])" +  // at least 1 special character
-                "(?=\\S+$)" +  // no white spaces
-                ".{8,}" +  // at least 4 characters
+                "(?=.*[@#$%^&+=])" +     // at least 1 special character
+                "(?=\\S+$)" +            // no white spaces
+                ".{4,}" +                // at least 4 characters
                 "$"
     )
 
     companion object {
-        private const val CAMERA_PERMISSION_CODE = 100
         private const val STORAGE_PERMISSION_CODE = 101
     }
 
@@ -53,31 +49,14 @@ class SignUpActivity : AppCompatActivity() {
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val date = OnDateSetListener { _, year, month, day ->
-            myCalendar[Calendar.YEAR] = year
-            myCalendar[Calendar.MONTH] = month
-            myCalendar[Calendar.DAY_OF_MONTH] = day
-            updateLabel()
-            binding.userAge.text = calculateAge(day, month, year).toEditable()
-        }
-        binding.userAge.setOnClickListener {
-            DatePickerDialog(
-                this@SignUpActivity,
-                date,
-                myCalendar[Calendar.YEAR],
-                myCalendar[Calendar.MONTH],
-                myCalendar[Calendar.DAY_OF_MONTH]
-            ).show()
-        }
+        binding.userAge.setOnClickListener(this)
 
-        binding.backListener.setOnClickListener {
-            finish()
-        }
+        binding.backListener.setOnClickListener(this)
 
         userDB = UserDB.getInstance(applicationContext)
         isUpdate = intent.getBooleanExtra("true", false)
         if (isUpdate) {
-            binding.btnSignup.text = "update"
+            binding.btnSignup.text = getString(R.string.update)
             userModel = intent.getSerializableExtra("model") as UserModel
             binding.txtUserFirstNameSignup.text = userModel.firstName!!.toEditable()
             binding.txtUserLastNameSignup.text = userModel.lastName!!.toEditable()
@@ -90,105 +69,64 @@ class SignUpActivity : AppCompatActivity() {
             binding.ivIconSu.setImageURI(getImageUri(this, bmp))
         }
 
-        binding.btnSignup.setOnClickListener {
-            val firstName = binding.txtUserFirstNameSignup.text.toString().trim()
-            val lastName = binding.txtUserLastNameSignup.text.toString().trim()
-            val email = binding.txtUserEmailSignup.text.toString().trim()
-            val password = binding.txtUserPasswordSignup.text.toString().trim()
-            val mobile = binding.txtUserMobileSignup.text.toString().trim()
-            val age = binding.userAge.text.toString().trim()
+        binding.btnSignup.setOnClickListener(this)
 
-            val reg =
-                """^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!-_?&])(?=S+$).{8,}""".toRegex()
+        binding.txtSignIn.setOnClickListener(this)
 
-            if (firstName == "") {
-                binding.txtUserFirstNameSignup.error = "please enter valid name"
-                binding.txtUserFirstNameSignup.requestFocus()
-                return@setOnClickListener
-            } else if (lastName == "") {
-                binding.txtUserLastNameSignup.error = "please enter valid name"
-                binding.txtUserLastNameSignup.requestFocus()
-                return@setOnClickListener
-            } else if ((email.isEmpty() && !Patterns.EMAIL_ADDRESS.matcher(email).matches())) {
-                binding.txtUserEmailSignup.error = "please enter valid email"
-                binding.txtUserEmailSignup.requestFocus()
-                return@setOnClickListener
-            } else if (mobile.isEmpty()) {
-                if (Patterns.PHONE.matcher(mobile).matches()) {
-                    binding.txtUserMobileSignup.error = "please enter valid mobile number"
-                    binding.txtUserMobileSignup.requestFocus()
-                    return@setOnClickListener
-                }
-                binding.txtUserMobileSignup.error = "please check your number"
-                binding.txtUserMobileSignup.requestFocus()
-                return@setOnClickListener
-            } else if (password.isEmpty()) {
-                if (!password_patterns.matcher(password).matches()) {
-                    binding.txtUserPasswordSignup.error = "password is too weak"
-                    binding.txtUserPasswordSignup.requestFocus()
-                    return@setOnClickListener
-                }
-                binding.txtUserPasswordSignup.error = "please enter valid password"
-                binding.txtUserPasswordSignup.requestFocus()
-                return@setOnClickListener
-            } else if (age.isNullOrEmpty()) {
-                binding.userAge.error = "please enter valid age"
-                binding.userAge.requestFocus()
-                return@setOnClickListener
-            } else if (age < 18.toString()) {
-                binding.userAge.error = "Your not eligible for sign up"
-                binding.userAge.requestFocus()
-                return@setOnClickListener
-            } else if (imageUri == null) {
-                Toast.makeText(this, "please insert your image", Toast.LENGTH_SHORT).show()
-                binding.ivIconSu.requestFocus()
-                return@setOnClickListener
+        binding.openGallery.setOnClickListener(this)
+
+        if (imageUri != null) {
+            binding.removeGallery.visible()
+            binding.openGallery.gone()
+        }
+    }
+
+    override fun onClick(v: View?) {
+        val i: Int? = v?.id
+        when (i) {
+            R.id.btn_signup -> addUpdateInfo()
+            R.id.txt_sign_in -> finish()
+            R.id.open_gallery -> {
+                checkPermission(WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE)
+
             }
-
-            if (isUpdate) {
-                binding.btnSignup.text = getString(R.string.update)
-                CoroutineScope(Dispatchers.IO).launch {
-                    userDB.userDao().updateUser(
-                        UserModel(
-                            userModel.uId,
-                            binding.txtUserFirstNameSignup.text.toString().trim(),
-                            binding.txtUserLastNameSignup.text.toString().trim(),
-                            binding.txtUserEmailSignup.text.toString().trim(),
-                            binding.txtUserPasswordSignup.text.toString().trim(),
-                            binding.txtUserMobileSignup.text.toString().trim(),
-                            binding.userAge.text.toString().trim(),
-                            imageUri.toString()
-                        )
-                    )
-                }
-                Toast.makeText(this, "user updated", Toast.LENGTH_SHORT).show()
-            } else {
-                CoroutineScope(Dispatchers.IO).launch {
-                    userDB.userDao().createUser(
-                        UserModel(
-                            null,
-                            binding.txtUserFirstNameSignup.text.toString().trim(),
-                            binding.txtUserLastNameSignup.text.toString().trim(),
-                            binding.txtUserEmailSignup.text.toString().trim(),
-                            binding.txtUserPasswordSignup.text.toString().trim(),
-                            binding.txtUserMobileSignup.text.toString().trim(),
-                            binding.userAge.text.toString().trim(),
-                            imageUri.toString()
-                        )
-                    )
-                }
-                Toast.makeText(this, "successfully added ", Toast.LENGTH_SHORT).show()
+            R.id.back_listener -> finish()
+            R.id.user_age -> {
+                DatePickerDialog(
+                    this@SignUpActivity,
+                    date(),
+                    myCalendar[Calendar.YEAR],
+                    myCalendar[Calendar.MONTH],
+                    myCalendar[Calendar.DAY_OF_MONTH]
+                ).show()
             }
-            finish()
         }
+    }
 
-        binding.txtSignIn.setOnClickListener {
-            finish()
+    private fun setModel(): UserModel {
+        val id: Int?
+        if (isUpdate) id = userModel.uId else id = null
+        return UserModel(
+            id,
+            binding.txtUserFirstNameSignup.text.toString().trim(),
+            binding.txtUserLastNameSignup.text.toString().trim(),
+            binding.txtUserEmailSignup.text.toString().trim(),
+            binding.txtUserPasswordSignup.text.toString().trim(),
+            binding.txtUserMobileSignup.text.toString().trim(),
+            binding.userAge.text.toString().trim(),
+            imageUri.toString()
+        )
+    }
+
+    private fun date(): OnDateSetListener {
+        val date = OnDateSetListener { _, year, month, day ->
+            myCalendar[Calendar.YEAR] = year
+            myCalendar[Calendar.MONTH] = month
+            myCalendar[Calendar.DAY_OF_MONTH] = day
+            updateLabel()
+            binding.userAge.text = calculateAge(day, month, year).toEditable()
         }
-//        if (!binding.ivIconSu.setImageURI(imageUri))
-        binding.openGallery.setOnClickListener {
-            checkPermission(WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE)
-        }
+        return date
     }
 
     private fun calculateAge(day: Int, month: Int, year: Int): String {
@@ -229,51 +167,133 @@ class SignUpActivity : AppCompatActivity() {
         return Uri.parse(path)
     }
 
-    private fun checkPermission(permission: String, requestCode: Int) {
-        if (ContextCompat.checkSelfPermission(
-                this@SignUpActivity,
-                permission
-            ) == PackageManager.PERMISSION_DENIED
-        ) {
-            ActivityCompat.requestPermissions(this@SignUpActivity, arrayOf(permission), requestCode)
+    private fun addUpdateInfo() {
+        val firstName = binding.txtUserFirstNameSignup.text.toString().trim()
+        val lastName = binding.txtUserLastNameSignup.text.toString().trim()
+        val email = binding.txtUserEmailSignup.text.toString().trim()
+        val password = binding.txtUserPasswordSignup.text.toString().trim()
+        val mobile = binding.txtUserMobileSignup.text.toString().trim()
+        val age = binding.userAge.text.toString().trim()
+
+        if (firstName.isEmpty()) {
+            binding.txtUserFirstNameSignup.error = getString(R.string.edittext_empty_check)
+            binding.txtUserFirstNameSignup.requestFocus()
+            return
+        } else if (lastName.isEmpty()) {
+            binding.txtUserLastNameSignup.error = getString(R.string.edittext_empty_check)
+            binding.txtUserLastNameSignup.requestFocus()
+            return
+        } else if ((email.isEmpty())) {
+            binding.txtUserEmailSignup.error = getString(R.string.edittext_empty_check)
+            binding.txtUserEmailSignup.requestFocus()
+            return
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.txtUserEmailSignup.error = getString(R.string.please_enter_valid_name)
+            binding.txtUserEmailSignup.requestFocus()
+            return
+        } else if (mobile.isEmpty()) {
+            binding.txtUserMobileSignup.error = getString(R.string.edittext_empty_check)
+            binding.txtUserMobileSignup.requestFocus()
+            return
+        }/* else if (Patterns.PHONE.matcher(mobile).matches()) {
+            binding.txtUserMobileSignup.error = getString(R.string.valid_pnohe_number)
+            binding.txtUserMobileSignup.requestFocus()
+            return
+        }*/ else if (password.isEmpty()) {
+            binding.txtUserPasswordSignup.error = getString(R.string.edittext_empty_check)
+            binding.txtUserPasswordSignup.requestFocus()
+            return
+        } else if (!password_patterns.matcher(password).matches()) {
+            binding.txtUserPasswordSignup.error = getString(R.string.weak_password)
+            binding.txtUserPasswordSignup.error = getString(R.string.password_structure)
+            binding.txtUserPasswordSignup.requestFocus()
+            return
+        } else if (age.isEmpty()) {
+            binding.userAge.error = getString(R.string.edittext_empty_check)
+            binding.userAge.requestFocus()
+            return
+        } else if (age < 18.toString()) {
+            binding.userAge.error = getString(R.string.edittext_empty_check)
+            binding.userAge.requestFocus()
+            return
+        } else if (imageUri == null) {
+            Toast.makeText(this, getString(R.string.edittext_empty_check), Toast.LENGTH_SHORT)
+                .show()
+            binding.ivIconSu.requestFocus()
+            return
+        }
+
+        if (isUpdate) {
+            binding.btnSignup.text = getString(R.string.update)
+            CoroutineScope(Dispatchers.IO).launch {
+                userDB.userDao().updateUser(setModel())
+            }
+            showToast(this, "user updated")
         } else {
-            val intent = Intent()
-            intent.type = "image/*"
-            intent.action = Intent.ACTION_GET_CONTENT
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 200)
+            CoroutineScope(Dispatchers.IO).launch {
+                userDB.userDao().createUser(setModel())
+            }
+            showToast(this, "successfully added ")
         }
+        finish()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
+}
+
+/*private fun checkPermission(permission: String, requestCode: Int) {
+    if (ContextCompat.checkSelfPermission(
+            this@SignUpActivity,
+            permission
+        ) == PackageManager.PERMISSION_DENIED
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this@SignUpActivity, "Camera Permission Granted", Toast.LENGTH_SHORT)
-                    .show()
-            } else {
-                Toast.makeText(this@SignUpActivity, "Camera Permission Denied", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        } else if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(
-                    this@SignUpActivity,
-                    "Storage Permission Granted",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                Toast.makeText(this@SignUpActivity, "Storage Permission Denied", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-    }
-
-    fun calculateDate() {
-        val getDate = binding.userAge.text.toString()
-
+        ActivityCompat.requestPermissions(this@SignUpActivity, arrayOf(permission), requestCode)
+    } else {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 200)
     }
 }
+
+override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<String>,
+    grantResults: IntArray
+) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    if (requestCode == CAMERA_PERMISSION_CODE) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            showToast(this, "Gallery Permission Granted")
+        } else {
+            showToast(this, "Gallery Permission Denied")
+        }
+    } else if (requestCode == STORAGE_PERMISSION_CODE) {
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            showToast(this, "Storage Permission Granted")
+        } else {
+            showToast(this, "Storage Permission Denied")
+        }
+    }
+}*/
+//add
+/*UserModel(
+                            null,
+                            binding.txtUserFirstNameSignup.text.toString().trim(),
+                            binding.txtUserLastNameSignup.text.toString().trim(),
+                            binding.txtUserEmailSignup.text.toString().trim(),
+                            binding.txtUserPasswordSignup.text.toString().trim(),
+                            binding.txtUserMobileSignup.text.toString().trim(),
+                            binding.userAge.text.toString().trim(),
+                            imageUri.toString()
+                        )*/
+//update
+/*UserModel(
+                            userModel.uId,
+                            binding.txtUserFirstNameSignup.text.toString().trim(),
+                            binding.txtUserLastNameSignup.text.toString().trim(),
+                            binding.txtUserEmailSignup.text.toString().trim(),
+                            binding.txtUserPasswordSignup.text.toString().trim(),
+                            binding.txtUserMobileSignup.text.toString().trim(),
+                            binding.userAge.text.toString().trim(),
+                            imageUri.toString()
+                        )*/

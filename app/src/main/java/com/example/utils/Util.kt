@@ -2,6 +2,8 @@ package com.example.utils
 
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -10,13 +12,21 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
-fun showToast(context: Context,message:String){
-    Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
+fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
-fun View.gone(){
+
+fun View.gone() {
     this.visibility = View.GONE
 }
+fun View.visible() {
+    this.visibility = View.VISIBLE
+}
+
 fun getPathFromUri(context: Context, uri: Uri): String? {
     val isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
 
@@ -128,4 +138,47 @@ fun isGooglePhotosUri(uri: Uri): Boolean {
     return "com.google.android.apps.photos.content" == uri.getAuthority()
 }
 
+open class BaseActivity : AppCompatActivity() {
+
+    companion object {
+        private const val GALLERY_PERMISSION_CODE = 100
+        private const val STORAGE_PERMISSION_CODE = 101
+    }
+
+    open fun checkPermission(permission: String, requestCode: Int) {
+        if (ContextCompat.checkSelfPermission(
+                this@BaseActivity,
+                permission
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            ActivityCompat.requestPermissions(this@BaseActivity, arrayOf(permission), requestCode)
+        } else {
+            val intent = Intent()
+            intent.type = "image/*"
+            intent.action = Intent.ACTION_GET_CONTENT
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 200)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == GALLERY_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showToast(this, "Gallery Permission Granted")
+            } else {
+                showToast(this, "Gallery Permission Denied")
+            }
+        } else if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showToast(this, "Storage Permission Granted")
+            } else {
+                showToast(this, "Storage Permission Denied")
+            }
+        }
+    }
+}
 

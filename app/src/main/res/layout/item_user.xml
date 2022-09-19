@@ -14,74 +14,67 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_user_img"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_margin="16dp"
             android:src="@drawable/ic_launcher_foreground"
             app:civ_border_color="#FF000000"
             app:civ_border_width="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:padding="4dp"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_user_img"
+            app:layout_constraintTop_toTopOf="@id/iv_user_img"
+            tools:text="hitesh khatri" />
 
         <TextView
             android:id="@+id/email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
             android:padding="4dp"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@id/iv_user_img"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_user_img"
-            app:layout_constraintTop_toTopOf="@id/iv_user_img" />
-
-        <TextView
-            android:id="@+id/first_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:padding="4dp"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="@id/iv_user_img"
-            app:layout_constraintTop_toBottomOf="@id/iv_user_img"
-            tools:text="hitesh khatri" />
-
-        <TextView
-            android:id="@+id/last_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:fontFamily="@font/tinos"
-            android:padding="4dp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/age"
-            app:layout_constraintStart_toStartOf="@id/iv_user_img"
-            app:layout_constraintTop_toBottomOf="@id/first_name"
-            tools:text="hitesh khatri hitesh" />
+            app:layout_constraintTop_toBottomOf="@id/name"
+            tools:text="hitesh@gmail.com" />
 
         <TextView
             android:id="@+id/mobile"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:maxLength="10"
             android:padding="4dp"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@id/first_name"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/first_name"
+            app:layout_constraintStart_toEndOf="@id/iv_user_img"
+            app:layout_constraintTop_toBottomOf="@id/email"
             tools:text="123456789010" />
 
         <TextView
             android:id="@+id/age"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
             android:padding="4dp"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@id/last_name"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/last_name"
+            app:layout_constraintTop_toBottomOf="@id/email"
             tools:text="38 Y/O" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

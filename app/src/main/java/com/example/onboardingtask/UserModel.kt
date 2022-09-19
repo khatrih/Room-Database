@@ -16,7 +16,4 @@ data class UserModel(
     @ColumnInfo(name = "age") val age: String?,
     @ColumnInfo(name = "image") val image: String
 ) : Serializable
-//    @PrimaryKey(autoGenerate = true)
-//    var uId: Int = 0
-//    var uIds: Int = uId
 

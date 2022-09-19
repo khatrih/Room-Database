@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/back_listener"
+            android:id="@+id/menu_listener"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/todo"
@@ -30,6 +30,17 @@
             app:titleTextColor="@color/status_bar" />
 
     </androidx.appcompat.widget.Toolbar>
+
+    <ImageView
+        android:id="@+id/logout_listener"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/ic_logout"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar_home"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/toolbar_home" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_image"

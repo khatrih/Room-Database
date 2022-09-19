@@ -21,9 +21,4 @@ abstract class UserDB : RoomDatabase() {
             return userDB!!
         }
     }
-
-
-//    private fun buildDB(context: Context) =
-//        Room.databaseBuilder(context.applicationContext, UserDB::class.java, "db_user").build()
-
 }

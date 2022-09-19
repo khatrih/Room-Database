@@ -15,11 +15,19 @@ class LauncherScreenActivity : AppCompatActivity() {
         binding = ActivityLauncherScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val preferences = getSharedPreferences("user_list", MODE_PRIVATE)
+        //val file = preferences.getString("MyObject", null)
         Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            if (preferences.getBoolean("checkScreen",false)) {
+                startActivity(Intent(applicationContext, HomeActivity::class.java))
+            } else {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
             finish()
         }, 2000)
+
+
     }
 }
 

@@ -1,22 +1,25 @@
 package com.example.onboardingtask
 
-import android.graphics.Color
 import android.os.Bundle
+import android.content.Intent
 import android.view.View
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.onboardingtask.databinding.ActivityUserListBinding
 import com.example.utils.gone
+import com.example.utils.visible
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.collections.ArrayList
 
-
-class UserListActivity : AppCompatActivity() {
+class UserListActivity : AppCompatActivity(), View.OnClickListener {
+    private lateinit var userList: List<UserModel>
     private lateinit var userDB: UserDB
     private lateinit var binding: ActivityUserListBinding
-    var coordinatorLayout: CoordinatorLayout? = null
     private lateinit var adapter: UserAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,75 +27,55 @@ class UserListActivity : AppCompatActivity() {
         binding = ActivityUserListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.backListenerUl.setOnClickListener {
-            finish()
-        }
+        binding.backListenerUl.setOnClickListener(this)
 
         userDB = UserDB.getInstance(applicationContext)
         binding.rvUser.layoutManager = LinearLayoutManager(this)
         userDB.userDao().getUsers().observe(this) {
             if (!it.isNullOrEmpty()) {
-                val userList = it
+                userList = it
                 adapter = UserAdapter(userList as ArrayList<UserModel>, this)
                 binding.rvUser.adapter = adapter
-                binding.noData.visibility = View.GONE
-                binding.rvUser.visibility = View.VISIBLE
-
-                /*val swipeGestures = object : SwipeGestures(this) {
-                    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                        when (direction) {
-                            ItemTouchHelper.LEFT -> {
-                                CoroutineScope(Dispatchers.Default).launch {
-                                    userDB.userDao()
-                                        .delete(adapter.getUser(viewHolder.layoutPosition))
-                                }
-                            }
-                            ItemTouchHelper.RIGHT -> {
-                                val intent = Intent(applicationContext, SignUpActivity::class.java)
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    intent.putExtra("true", true)
-                                    intent.putExtra("model", it[viewHolder.adapterPosition])
-                                    startActivity(intent)
-                                }
-                            }
-                        }
-                    }
-                }*/
-
-
-                /*val touchListener = ItemTouchHelper(swipeGestures)
-                touchListener.attachToRecyclerView(binding.rvUser)*/
-
-                enableSwipeToDeleteAndUndo()
+                binding.noData.gone()
+                binding.rvUser.visible()
+                enableSwipeToDeleteAndUndo(it)
             } else {
-                binding.noData.visibility = View.VISIBLE
+                binding.noData.visible()
                 binding.rvUser.gone()
             }
         }
     }
 
-    private fun enableSwipeToDeleteAndUndo() {
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.back_listener_ul -> finish()
+        }
+    }
+
+    private fun enableSwipeToDeleteAndUndo(list: List<UserModel>) {
         val swipeToDeleteCallback: SwipeToDeleteCallback = object : SwipeToDeleteCallback(this) {
-            override fun onSwiped(@NonNull viewHolder: RecyclerView.ViewHolder, i: Int) {
+            override fun onSwiped(@NonNull viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                //val item: String = adapter.getData().get(position)
                 adapter.getUser(position)
-//                val snackbar: Snackbar = Snackbar
-//                    .make(
-//                        coordinatorLayout!!,
-//                        "Item was removed from the list.",
-//                        Snackbar.LENGTH_LONG
-//                    )
-//                snackbar.setAction("UNDO", View.OnClickListener {
-//                    adapter.restoreItem(item, position)
-//                    recyclerView.scrollToPosition(position)
-//                })
-//                snackbar.setActionTextColor(Color.YELLOW)
-//                snackbar.show()
+                when (direction) {
+                    ItemTouchHelper.LEFT -> {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            userDB.userDao()
+                                .delete(adapter.getUser(viewHolder.layoutPosition))
+                        }
+                    }
+                    ItemTouchHelper.RIGHT -> {
+                        val intent = Intent(applicationContext, SignUpActivity::class.java)
+                        CoroutineScope(Dispatchers.IO).launch {
+                            intent.putExtra("true", true)
+                            intent.putExtra("model", list[viewHolder.adapterPosition])
+                            startActivity(intent)
+                        }
+                    }
+                }
             }
         }
         val itemTouchhelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchhelper.attachToRecyclerView(binding.rvUser)
     }
-
 }

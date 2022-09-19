@@ -1,7 +1,6 @@
 package com.example.onboardingtask
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.LayoutInflater
@@ -20,18 +19,16 @@ class UserAdapter(private val userList: ArrayList<UserModel>, var context: Conte
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val userModel = userList[position]
-        holder.binding.firstName.text = "First Name :- ${userModel.firstName}"
-        holder.binding.lastName.text = "Last Name :- ${userModel.lastName}"
-        holder.binding.email.text = "Email :- ${userModel.userEmail}"
-        holder.binding.mobile.text = "Mobile Number :- ${userModel.userMobile}"
-        holder.binding.age.text = "Age :- ${userModel.age} y/o"
+        "${userModel.firstName} ${userModel.lastName}".also { holder.binding.name.text = it }
+        holder.binding.email.text = userModel.userEmail
+        holder.binding.mobile.text = userModel.userMobile
+        "${userModel.age} y/o".also { holder.binding.age.text = it }
 
         if (userModel.image.isNotEmpty()) {
             val bmp: Bitmap = BitmapFactory.decodeFile(userModel.image)
             holder.binding.ivUserImg.setImageBitmap(bmp)
         }
         //holder.binding.ivUserImg.setImageResource(R.drawable.ic_launcher_foreground)
-
         //val uri: Uri = Uri.parse(userModel.image)
         /*Picasso.get().load(userModel.image).placeholder(R.drawable.ic_launcher_foreground)
             .into(holder.binding.ivUserImg)*/

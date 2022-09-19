@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/ic_baseline_add.xml" value="0.2025" />
+        <entry key="app/src/main/res/drawable/ic_delete.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/ic_remove_circle_.xml" value="0.1985" />
+        <entry key="app/src/main/res/drawable/ic_user_list.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/rv_bg_shape.xml" value="0.1985" />
         <entry key="app/src/main/res/layout/activity_home.xml" value="0.3411458333333333" />
         <entry key="app/src/main/res/layout/activity_luncher_screen.xml" value="0.35625" />
@@ -14,6 +16,7 @@
         <entry key="app/src/main/res/layout/item_api_user.xml" value="0.32314814814814813" />
         <entry key="app/src/main/res/layout/item_user.xml" value="0.35625" />
         <entry key="app/src/main/res/menu/item_toolbar_menu.xml" value="0.18177083333333333" />
+        <entry key="app/src/main/res/menu/menu_item_home.xml" value="0.35520833333333335" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.19" />
       </map>
     </option>
