@@ -28,6 +28,7 @@ class UserAdapter(private val userList: ArrayList<UserModel>, var context: Conte
             val bmp: Bitmap = BitmapFactory.decodeFile(userModel.image)
             holder.binding.ivUserImg.setImageBitmap(bmp)
         }
+
         //holder.binding.ivUserImg.setImageResource(R.drawable.ic_launcher_foreground)
         //val uri: Uri = Uri.parse(userModel.image)
         /*Picasso.get().load(userModel.image).placeholder(R.drawable.ic_launcher_foreground)

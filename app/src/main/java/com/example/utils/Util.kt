@@ -23,6 +23,7 @@ fun showToast(context: Context, message: String) {
 fun View.gone() {
     this.visibility = View.GONE
 }
+
 fun View.visible() {
     this.visibility = View.VISIBLE
 }
