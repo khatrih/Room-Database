@@ -20,4 +20,11 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="android:statusBarColor">@color/status_bar</item>
     </style>
+
+    <!--<style name="Theme.App.Starting" parent="Theme.SplashScreen.IconBackground">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/iconhd</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/action_bar
+        </item>
+        <item name="postSplashScreenTheme">@style/Theme.Custom</item>
+    </style>-->
 </resources>

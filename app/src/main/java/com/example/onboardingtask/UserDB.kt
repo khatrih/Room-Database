@@ -13,10 +13,13 @@ abstract class UserDB : RoomDatabase() {
         private var userDB: UserDB? = null
         fun getInstance(context: Context): UserDB {
             if (userDB == null) {
-                userDB = Room.databaseBuilder(
-                    context,
-                    UserDB::class.java, "student_database"
-                ).build()
+                /** we have multiple thread so we use locking mechanisms instance using synchronized */
+                synchronized(this) {
+                    userDB = Room.databaseBuilder(
+                        context.applicationContext,
+                        UserDB::class.java, "student_database"
+                    ).build()
+                }
             }
             return userDB!!
         }

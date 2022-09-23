@@ -10,6 +10,7 @@ import com.example.onboardingtask.databinding.ActivityMainBinding
 import com.example.utils.showToast
 import com.google.gson.Gson
 import java.util.regex.Pattern
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityMainBinding
@@ -23,10 +24,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         userDB = UserDB.getInstance(applicationContext)
+
 
         binding.btnLogin.setOnClickListener(this)
 
@@ -101,6 +104,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         showToast(this, "Given details not registered")
                     }
                 }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val preferences = getSharedPreferences("user_list", MODE_PRIVATE)
+        if (preferences.getBoolean("checkScreen", false)) {
+            startActivity(Intent(applicationContext, HomeActivity::class.java))
         }
     }
 }
